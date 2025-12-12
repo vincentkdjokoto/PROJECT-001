@@ -1,0 +1,42 @@
+# 8. Summary of Key Findings
+print("\n" + "="*50)
+print("KEY INSIGHTS & CONCLUSIONS")
+print("="*50)
+
+# Create a summary DataFrame
+insights = []
+
+# Insight 1: Most common audio feature ranges
+insights.append({
+    'Insight': 'Audio Feature Ranges',
+    'Description': f"Most songs have danceability between {df['danceability'].quantile(0.25):.2f}-{df['danceability'].quantile(0.75):.2f} and energy between {df['energy'].quantile(0.25):.2f}-{df['energy'].quantile(0.75):.2f}"
+})
+
+# Insight 2: Strongest correlation
+strongest_corr = corr_matrix.unstack().sort_values(ascending=False)
+strongest_pair = strongest_corr[strongest_corr < 0.99].index[1]  # Skip perfect self-correlation
+insights.append({
+    'Insight': 'Strongest Correlation',
+    'Description': f"{strongest_pair[0]} and {strongest_pair[1]} are strongly correlated (r = {strongest_corr[1]:.3f})"
+})
+
+# Insight 3: Popularity trend
+if p_value < 0.05:
+    trend_direction = "increasing" if slope > 0 else "decreasing"
+    insights.append({
+        'Insight': 'Popularity Trend',
+        'Description': f"Song popularity shows a statistically significant {trend_direction} trend over time (p = {p_value:.4f})"
+    })
+
+# Insight 4: Genre distribution
+if 'genre' in df.columns:
+    top_genre = df['genre'].value_counts().index[0]
+    insights.append({
+        'Insight': 'Most Common Genre',
+        'Description': f"'{top_genre}' is the most common genre with {df['genre'].value_counts().iloc[0]} songs"
+    })
+
+# Convert to DataFrame for nice display
+insights_df = pd.DataFrame(insights)
+print("\nSummary of Key Insights:")
+print(insights_df.to_string(index=False))
