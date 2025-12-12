@@ -1,0 +1,19 @@
+# 1. Display basic information
+print("="*50)
+print("DATASET INFORMATION")
+print("="*50)
+
+# First few rows
+print("\nFirst 5 rows:")
+print(df.head())
+
+# Data types and missing values
+print("\nData types and missing values:")
+print(df.info())
+
+# Summary statistics
+print("\nSummary statistics for numerical features:")
+print(df.describe())
+
+# Check for duplicates
+print(f"\nNumber of duplicate rows: {df.duplicated().sum()}")
