@@ -1,0 +1,50 @@
+# 6. Artist-Level Insights
+print("\n" + "="*50)
+print("ARTIST ANALYSIS")
+print("="*50)
+
+# Most popular artists (by average popularity of their songs)
+artist_stats = df.groupby('artist_name').agg({
+    'popularity': 'mean',
+    'track_name': 'count',
+    'danceability': 'mean',
+    'energy': 'mean'
+}).round(2)
+
+artist_stats = artist_stats.rename(columns={
+    'track_name': 'song_count',
+    'popularity': 'avg_popularity'
+})
+
+# Filter artists with at least 5 songs
+top_artists = artist_stats[artist_stats['song_count'] >= 5].sort_values(
+    'avg_popularity', ascending=False
+).head(10)
+
+print("\nTop 10 Artists (minimum 5 songs):")
+print(top_artists[['song_count', 'avg_popularity']])
+
+# Visualize
+fig, ax1 = plt.subplots(figsize=(14, 6))
+
+x = np.arange(len(top_artists))
+width = 0.35
+
+bars1 = ax1.bar(x - width/2, top_artists['avg_popularity'], width, 
+                label='Avg Popularity', color='cornflowerblue')
+ax1.set_xlabel('Artist')
+ax1.set_ylabel('Average Popularity', color='cornflowerblue')
+ax1.tick_params(axis='y', labelcolor='cornflowerblue')
+ax1.set_xticks(x)
+ax1.set_xticklabels(top_artists.index, rotation=45, ha='right')
+
+ax2 = ax1.twinx()
+bars2 = ax2.bar(x + width/2, top_artists['song_count'], width, 
+                label='Song Count', color='salmon')
+ax2.set_ylabel('Number of Songs', color='salmon')
+ax2.tick_params(axis='y', labelcolor='salmon')
+
+plt.title('Top Artists: Popularity vs Song Count', fontsize=16, pad=20)
+fig.tight_layout()
+plt.savefig('../reports/visualizations/top_artists.png', dpi=300, bbox_inches='tight')
+plt.show()
