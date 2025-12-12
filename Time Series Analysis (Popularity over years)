@@ -1,0 +1,37 @@
+# 4. Trends Over Time
+print("\n" + "="*50)
+print("TRENDS OVER TIME")
+print("="*50)
+
+# Average popularity by year
+popularity_by_year = df.groupby('year')['popularity'].agg(['mean', 'std', 'count']).reset_index()
+
+plt.figure(figsize=(14, 6))
+
+# Plot with confidence interval
+plt.plot(popularity_by_year['year'], popularity_by_year['mean'], 
+         marker='o', linewidth=2, markersize=6, color='green', label='Mean Popularity')
+plt.fill_between(popularity_by_year['year'], 
+                 popularity_by_year['mean'] - popularity_by_year['std'],
+                 popularity_by_year['mean'] + popularity_by_year['std'],
+                 alpha=0.2, color='green', label='±1 Std Dev')
+
+plt.title('Average Song Popularity by Release Year', fontsize=16, pad=20)
+plt.xlabel('Year', fontsize=14)
+plt.ylabel('Popularity Score', fontsize=14)
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig('../reports/visualizations/popularity_trend.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Statistical test for trend
+from scipy import stats
+slope, intercept, r_value, p_value, std_err = stats.linregress(
+    popularity_by_year['year'], popularity_by_year['mean']
+)
+print(f"\nTrend Analysis: Popularity vs Year")
+print(f"Slope: {slope:.4f} (Popularity change per year)")
+print(f"R-squared: {r_value**2:.4f}")
+print(f"P-value: {p_value:.4f}")
+print(f"Interpretation: {'Significant trend' if p_value < 0.05 else 'No significant trend'}")
