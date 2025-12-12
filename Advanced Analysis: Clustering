@@ -1,0 +1,62 @@
+# 7. Song Clustering (Bonus - shows advanced skills)
+print("\n" + "="*50)
+print("SONG CLUSTERING ANALYSIS")
+print("="*50)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+
+# Select features for clustering
+cluster_features = ['danceability', 'energy', 'loudness', 'valence', 
+                    'tempo', 'acousticness', 'speechiness']
+
+# Prepare data
+X = df[cluster_features].dropna()
+X_scaled = StandardScaler().fit_transform(X)
+
+# Determine optimal number of clusters using elbow method
+inertia = []
+k_range = range(2, 11)
+
+for k in k_range:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    kmeans.fit(X_scaled)
+    inertia.append(kmeans.inertia_)
+
+# Plot elbow curve
+plt.figure(figsize=(10, 6))
+plt.plot(k_range, inertia, marker='o', linewidth=2, markersize=8)
+plt.xlabel('Number of Clusters', fontsize=14)
+plt.ylabel('Inertia', fontsize=14)
+plt.title('Elbow Method for Optimal k', fontsize=16, pad=20)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('../reports/visualizations/elbow_method.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Apply K-Means with chosen k (let's pick 4 based on elbow)
+optimal_k = 4
+kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
+df_clustered = df.copy()
+df_clustered['cluster'] = kmeans.fit_predict(X_scaled)
+
+# Visualize clusters with PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+plt.figure(figsize=(12, 8))
+scatter = plt.scatter(X_pca[:, 0], X_pca[:, 1], c=df_clustered['cluster'], 
+                     cmap='viridis', alpha=0.6, s=30)
+plt.xlabel(f'PCA Component 1 ({pca.explained_variance_ratio_[0]:.1%} variance)', fontsize=14)
+plt.ylabel(f'PCA Component 2 ({pca.explained_variance_ratio_[1]:.1%} variance)', fontsize=14)
+plt.title('Song Clusters (K-means with PCA Visualization)', fontsize=16, pad=20)
+plt.colorbar(scatter, label='Cluster')
+plt.tight_layout()
+plt.savefig('../reports/visualizations/song_clusters.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Analyze cluster characteristics
+cluster_summary = df_clustered.groupby('cluster')[cluster_features].mean().round(3)
+print("\nCluster Characteristics (Mean Values):")
+print(cluster_summary)
