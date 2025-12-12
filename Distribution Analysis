@@ -1,0 +1,31 @@
+# 2. Distributions of key features
+print("\n" + "="*50)
+print("DISTRIBUTION ANALYSIS")
+print("="*50)
+
+# Select key audio features for visualization
+audio_features = ['danceability', 'energy', 'valence', 'acousticness', 
+                  'instrumentalness', 'liveness', 'speechiness']
+
+# Create distribution plots
+fig, axes = plt.subplots(3, 3, figsize=(15, 12))
+axes = axes.flatten()
+
+for idx, feature in enumerate(audio_features[:9]):
+    if feature in df.columns:
+        ax = axes[idx]
+        # Histogram with KDE
+        sns.histplot(df[feature], bins=30, kde=True, ax=ax, color='skyblue')
+        ax.set_title(f'Distribution of {feature}', fontsize=14)
+        ax.set_xlabel(feature)
+        ax.set_ylabel('Frequency')
+        
+        # Add mean line
+        mean_val = df[feature].mean()
+        ax.axvline(mean_val, color='red', linestyle='--', 
+                  label=f'Mean: {mean_val:.2f}')
+        ax.legend()
+
+plt.tight_layout()
+plt.savefig('../reports/visualizations/distributions.png', dpi=300, bbox_inches='tight')
+plt.show()
