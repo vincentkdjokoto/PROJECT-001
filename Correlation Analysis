@@ -1,0 +1,35 @@
+# 3. Correlation Matrix
+print("\n" + "="*50)
+print("CORRELATION ANALYSIS")
+print("="*50)
+
+# Select numerical features for correlation
+numerical_features = ['danceability', 'energy', 'loudness', 'speechiness',
+                      'acousticness', 'instrumentalness', 'liveness',
+                      'valence', 'tempo', 'duration_ms', 'popularity']
+
+# Create correlation matrix
+corr_matrix = df[numerical_features].corr()
+
+# Plot heatmap
+plt.figure(figsize=(14, 10))
+mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+sns.heatmap(corr_matrix, mask=mask, annot=True, fmt='.2f', cmap='coolwarm',
+            center=0, square=True, linewidths=.5, cbar_kws={"shrink": 0.8})
+plt.title('Correlation Matrix of Audio Features', fontsize=16, pad=20)
+plt.tight_layout()
+plt.savefig('../reports/visualizations/correlation_matrix.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# Print top correlations
+print("\nTop 10 Positive Correlations:")
+corr_pairs = corr_matrix.unstack()
+sorted_pairs = corr_pairs.sort_values(kind="quicksort", ascending=False)
+for idx in range(0, 20, 2):
+    if idx < len(sorted_pairs) and sorted_pairs.index[idx][0] != sorted_pairs.index[idx][1]:
+        print(f"{sorted_pairs.index[idx][0]} & {sorted_pairs.index[idx][1]}: {sorted_pairs[idx]:.3f}")
+
+print("\nTop 10 Negative Correlations:")
+for idx in range(-1, -21, -2):
+    if abs(idx) <= len(sorted_pairs) and sorted_pairs.index[idx][0] != sorted_pairs.index[idx][1]:
+        print(f"{sorted_pairs.index[idx][0]} & {sorted_pairs.index[idx][1]}: {sorted_pairs[idx]:.3f}")
