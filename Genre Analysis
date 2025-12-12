@@ -1,0 +1,43 @@
+# 5. Genre Analysis
+print("\n" + "="*50)
+print("GENRE ANALYSIS")
+print("="*50)
+
+if 'genre' in df.columns:
+    # Top genres by count
+    top_genres = df['genre'].value_counts().head(15)
+    
+    plt.figure(figsize=(14, 8))
+    bars = plt.barh(top_genres.index, top_genres.values, color='steelblue')
+    plt.xlabel('Number of Songs', fontsize=14)
+    plt.title('Top 15 Genres by Number of Songs', fontsize=16, pad=20)
+    plt.gca().invert_yaxis()  # Highest on top
+    
+    # Add value labels
+    for bar in bars:
+        width = bar.get_width()
+        plt.text(width + 10, bar.get_y() + bar.get_height()/2, 
+                f'{int(width)}', va='center')
+    
+    plt.tight_layout()
+    plt.savefig('../reports/visualizations/top_genres.png', dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    # Audio features by genre (top 5 genres)
+    top_5_genres = top_genres.head(5).index.tolist()
+    genre_subset = df[df['genre'].isin(top_5_genres)]
+    
+    # Create boxplot for key features
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    features_to_plot = ['danceability', 'energy', 'valence', 'acousticness']
+    
+    for idx, feature in enumerate(features_to_plot):
+        ax = axes[idx//2, idx%2]
+        sns.boxplot(data=genre_subset, x='genre', y=feature, ax=ax, palette='Set2')
+        ax.set_title(f'{feature} by Genre', fontsize=14)
+        ax.set_xlabel('')
+        ax.tick_params(axis='x', rotation=45)
+    
+    plt.tight_layout()
+    plt.savefig('../reports/visualizations/features_by_genre.png', dpi=300, bbox_inches='tight')
+    plt.show()
